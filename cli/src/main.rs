@@ -368,17 +368,15 @@ async fn handle_tapsigner_command<T: CkTransport>(
             let mut addresses = std::collections::HashMap::new();
 
             // Convert to Bitcoin address if BIP84 path
-            if !path.is_empty() && path[0] == 84 {
-                if let Ok(pubkey) = bitcoin::PublicKey::from_slice(pubkey_hex) {
-                    if let Ok(compressed) = bitcoin::CompressedPublicKey::try_from(pubkey) {
-                        let mainnet_addr =
-                            bitcoin::Address::p2wpkh(&compressed, bitcoin::Network::Bitcoin);
-                        let testnet_addr =
-                            bitcoin::Address::p2wpkh(&compressed, bitcoin::Network::Testnet);
-                        addresses.insert("mainnet".to_string(), mainnet_addr.to_string());
-                        addresses.insert("testnet".to_string(), testnet_addr.to_string());
-                    }
-                }
+            if !path.is_empty()
+                && path[0] == 84
+                && let Ok(pubkey) = bitcoin::PublicKey::from_slice(pubkey_hex)
+                && let Ok(compressed) = bitcoin::CompressedPublicKey::try_from(pubkey)
+            {
+                let mainnet_addr = bitcoin::Address::p2wpkh(&compressed, bitcoin::Network::Bitcoin);
+                let testnet_addr = bitcoin::Address::p2wpkh(&compressed, bitcoin::Network::Testnet);
+                addresses.insert("mainnet".to_string(), mainnet_addr.to_string());
+                addresses.insert("testnet".to_string(), testnet_addr.to_string());
             }
 
             let path_str = path
