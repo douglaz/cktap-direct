@@ -53,6 +53,23 @@
         PKG_CONFIG_PATH = "${pkgs.pkgsStatic.libusb1}/lib/pkgconfig:${pkgs.pkgsStatic.libudev-zero}/lib/pkgconfig";
         
         RUST_SRC_PATH = pkgs.rustPlatform.rustLibSrc;
+        
+        # Automatically configure Git hooks for code quality
+        shellHook = ''
+          # Set up Git hooks if not already configured
+          if [ -d .git ] && [ -d .githooks ]; then
+            current_hooks_path=$(git config core.hooksPath || echo "")
+            if [ "$current_hooks_path" != ".githooks" ]; then
+              echo "📎 Setting up Git hooks for code quality checks..."
+              git config core.hooksPath .githooks
+              echo "✅ Git hooks configured automatically!"
+              echo "   • pre-commit: Checks code formatting"
+              echo "   • pre-push: Runs formatting and clippy checks"
+              echo ""
+              echo "To disable: git config --unset core.hooksPath"
+            fi
+          fi
+        '';
       };
     });
 }
