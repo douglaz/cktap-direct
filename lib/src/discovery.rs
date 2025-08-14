@@ -32,13 +32,13 @@ pub async fn find_first() -> Result<CkTapCard<UsbTransport>, Error> {
     info!("Searching for CCID devices...");
 
     for device in context.devices().map_err(Error::Usb)?.iter() {
-        if let Ok(info) = get_device_info(&device) {
-            if info.is_coinkite {
-                info!("Found Coinkite device: {info:?}");
+        if let Ok(info) = get_device_info(&device)
+            && info.is_coinkite
+        {
+            info!("Found Coinkite device: {info:?}");
 
-                if let Ok(transport) = open_ccid_device(&device) {
-                    return transport.to_cktap().await;
-                }
+            if let Ok(transport) = open_ccid_device(&device) {
+                return transport.to_cktap().await;
             }
         }
     }
@@ -49,41 +49,41 @@ pub async fn find_first() -> Result<CkTapCard<UsbTransport>, Error> {
 
     // First try OMNIKEY readers (known to work well)
     for device in &devices {
-        if let Ok(info) = get_device_info(device) {
-            if info.vendor_id == 0x076B {
-                // OMNIKEY vendor ID
-                info!("Trying OMNIKEY reader: {info:?}");
+        if let Ok(info) = get_device_info(device)
+            && info.vendor_id == 0x076B
+        {
+            // OMNIKEY vendor ID
+            info!("Trying OMNIKEY reader: {info:?}");
 
-                match open_ccid_device(device) {
-                    Ok(transport) => match transport.to_cktap().await {
-                        Ok(card) => return Ok(card),
-                        Err(e) => debug!("Failed to initialize card: {e}"),
-                    },
-                    Err(e) => debug!("Failed to open device: {e}"),
-                }
+            match open_ccid_device(device) {
+                Ok(transport) => match transport.to_cktap().await {
+                    Ok(card) => return Ok(card),
+                    Err(e) => debug!("Failed to initialize card: {e}"),
+                },
+                Err(e) => debug!("Failed to open device: {e}"),
             }
         }
     }
 
     // Then try other CCID devices
     for device in &devices {
-        if is_ccid_device(device).unwrap_or(false) {
-            if let Ok(info) = get_device_info(device) {
-                // Skip YubiKey for now - it might not have a card inserted
-                if info.vendor_id == 0x1050 {
-                    debug!("Skipping YubiKey");
-                    continue;
-                }
+        if is_ccid_device(device).unwrap_or(false)
+            && let Ok(info) = get_device_info(device)
+        {
+            // Skip YubiKey for now - it might not have a card inserted
+            if info.vendor_id == 0x1050 {
+                debug!("Skipping YubiKey");
+                continue;
+            }
 
-                debug!("Trying generic CCID device: {info:?}");
+            debug!("Trying generic CCID device: {info:?}");
 
-                match open_ccid_device(device) {
-                    Ok(transport) => match transport.to_cktap().await {
-                        Ok(card) => return Ok(card),
-                        Err(e) => debug!("Failed to initialize card: {e}"),
-                    },
-                    Err(e) => debug!("Failed to open device: {e}"),
-                }
+            match open_ccid_device(device) {
+                Ok(transport) => match transport.to_cktap().await {
+                    Ok(card) => return Ok(card),
+                    Err(e) => debug!("Failed to initialize card: {e}"),
+                },
+                Err(e) => debug!("Failed to open device: {e}"),
             }
         }
     }
