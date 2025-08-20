@@ -12,6 +12,8 @@ skip = []
 skip-tree = []
 
 [licenses]
+# Use version 2 of the license check
+version = 2
 # List of explicitly allowed licenses
 allow = [
     "MIT",
@@ -25,12 +27,6 @@ allow = [
     "MPL-2.0",
     "Unlicense",
 ]
-# List of explicitly disallowed licenses
-deny = []
-# Lint level for when a crate doesn't have a license
-unlicensed = "deny"
-# Lint level for licenses not explicitly allowed or denied
-default = "deny"
 # Confidence threshold for license detection (0.0 to 1.0)
 confidence-threshold = 0.8
 # Allow licenses in private crates
@@ -47,14 +43,12 @@ allow-registry = ["https://github.com/rust-lang/crates.io-index"]
 allow-git = []
 
 [advisories]
+# Use version 2 of the advisories check
+version = 2
 # The path where the advisory database is cloned/fetched into
 db-path = "~/.cargo/advisory-db"
 # The url(s) of the advisory databases to use
 db-urls = ["https://github.com/rustsec/advisory-db"]
-# The lint level for security vulnerabilities
-vulnerability = "deny"
-# The lint level for crates with security notices
-notice = "warn"
 # A list of advisory IDs to ignore
 ignore = []
 # The lint level for yanked crates
