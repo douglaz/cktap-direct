@@ -27,6 +27,7 @@
           # Rust with musl target
           rustToolchain
           cargo-watch
+          cargo-edit
           clippy
 
           # For dependencies
